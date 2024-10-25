@@ -1,58 +1,90 @@
-# create-svelte
+# ComfyUI Guide
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+A comprehensive guide website built with Svelte and TailwindCSS to help users master ComfyUI and AI art creation. This project aims to provide tutorials, tips, and showcase community artwork.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
+## Features
 
-## Creating a project
+- 📚 Comprehensive getting started guides
+- 🎨 Interactive tutorials for AI art creation
+- 💡 Tips & tricks for optimal results
+- 🖼️ Community gallery showcase
+- 🌓 Dark mode support
+- 📱 Responsive design
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Tech Stack
 
+- [SvelteKit](https://kit.svelte.dev/) - Web application framework
+- [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Lucide Icons](https://lucide.dev/) - Beautiful icon set
+- [@tailwindcss/typography](https://tailwindcss.com/docs/typography-plugin) - Prose styling
+- [@tailwindcss/forms](https://github.com/tailwindlabs/tailwindcss-forms) - Form styling
+- [@tailwindcss/aspect-ratio](https://github.com/tailwindlabs/tailwindcss-aspect-ratio) - Aspect ratio utilities
+- [@tailwindcss/container-queries](https://github.com/tailwindlabs/tailwindcss-container-queries) - Container query support
+
+## Getting Started
+
+1. Clone the repository:
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+git clone <your-repo-url>
+cd comfyui-guide
 ```
 
-## Developing
+2. Install dependencies:
+```bash
+npm install
+# or
+pnpm install
+# or
+yarn install
+```
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
+3. Start the development server:
 ```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
+# or
 npm run dev -- --open
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+## Project Structure
 
-## Building
-
-To build your library:
-
-```bash
-npm run package
+```
+src/
+├── app.css                 # Global styles and Tailwind imports
+├── lib/
+│   ├── components/        # Reusable components
+│   │   ├── layout/       # Layout components (Navbar, PageWrapper)
+│   │   └── shared/       # Shared components (FeatureCard, ThemeToggle)
+│   └── stores/           # Svelte stores (theme)
+└── routes/               # SvelteKit routes
+    ├── getting-started/  # Getting started guide
+    ├── tutorials/        # Tutorial pages
+    ├── tricks/          # Tips & tricks
+    └── gallery/         # Community gallery
 ```
 
-To create a production version of your showcase app:
+## Building for Production
+
+To create a production version of your app:
 
 ```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
+Preview the production build with:
 
 ```bash
-npm publish
+npm run preview
 ```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[MIT](LICENSE)
+
+## Acknowledgments
+
+- ComfyUI community for inspiration and resources
+- All contributors and users of this guide
