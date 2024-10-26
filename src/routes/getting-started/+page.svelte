@@ -10,6 +10,10 @@
 			steps: [
 				'Install Python 3.10 or higher',
 				'Clone the ComfyUI repository',
+				{
+					text: 'Clone URL:',
+					code: 'git clone https://github.com/comfyanonymous/ComfyUI'
+				},
 				'Install required dependencies',
 				'Download necessary model files'
 			]
@@ -33,7 +37,18 @@
 				<ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-200">
 					{#if section.steps}
 						{#each section.steps as step}
-							<li>{step}</li>
+							{#if typeof step === 'string'}
+								<li>{step}</li>
+							{:else}
+								<li>
+									{step.text}
+									<code
+										class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono mt-1 block"
+									>
+										{step.code}
+									</code>
+								</li>
+							{/if}
 						{/each}
 					{/if}
 					{#if section.topics}
