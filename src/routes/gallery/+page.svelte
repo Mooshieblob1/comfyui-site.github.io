@@ -50,7 +50,7 @@
 			<p>Error loading gallery: {error}</p>
 		</div>
 	{:else}
-		<div class="pb-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+		<div class="pb-6 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 			{#each posts as post}
 				<div
 					class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300"
@@ -69,14 +69,14 @@
 							</div>
 						{/if}
 					</div>
-					<div class="p-4">
-						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+					<div class="p-3">
+						<h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
 							{post.tag_string_general.split(' ')[0]}
 						</h3>
-						<p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+						<p class="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
 							{post.tag_string_general.split(' ').slice(1, 4).join(', ')}
 						</p>
-						<div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+						<div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
 							<p>Score: {post.score}</p>
 							<p>Rating: {post.rating.toUpperCase()}</p>
 						</div>
