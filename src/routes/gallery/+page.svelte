@@ -6,7 +6,7 @@
 
 	interface AIPost {
 		id: number;
-		preview_file_url: string;
+		file_url: string;
 		tag_string_general: string;
 		score: number;
 		rating: string;
@@ -56,9 +56,9 @@
 					class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300"
 				>
 					<div class="aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">
-						{#if post.preview_file_url}
+						{#if post.file_url}
 							<img
-								src={post.preview_file_url}
+								src={post.file_url}
 								alt={post.tag_string_general}
 								class="object-cover w-full h-full"
 								loading="lazy"
