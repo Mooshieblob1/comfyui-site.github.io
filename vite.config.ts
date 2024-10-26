@@ -1,12 +1,7 @@
-import adapter from '@sveltejs/adapter-cloudflare';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import type { Config } from '@sveltejs/kit';
+// vite.config.ts
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
 
-const config: Config = {
-	kit: {
-		adapter: adapter()
-	},
-	preprocess: vitePreprocess()
-};
-
-export default config;
+export default defineConfig({
+	plugins: [sveltekit()]
+});
