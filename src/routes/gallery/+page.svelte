@@ -55,7 +55,7 @@
 				<div
 					class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300"
 				>
-					<div class="aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">
+					<div class="aspect-w-3 aspect-h-4 bg-gray-100 dark:bg-gray-700">
 						{#if post.file_url}
 							<img
 								src={post.file_url}
