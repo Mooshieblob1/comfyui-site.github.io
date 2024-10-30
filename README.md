@@ -20,6 +20,7 @@ A comprehensive guide website built with Svelte and TailwindCSS to help users ma
 - [@tailwindcss/forms](https://github.com/tailwindlabs/tailwindcss-forms) - Form styling
 - [@tailwindcss/aspect-ratio](https://github.com/tailwindlabs/tailwindcss-aspect-ratio) - Aspect ratio utilities
 - [@tailwindcss/container-queries](https://github.com/tailwindlabs/tailwindcss-container-queries) - Container query support
+- [Adapter for Cloudflare](https://kit.svelte.dev/docs/adapters#supported-environments-cloudflare) - Deploy to Cloudflare
 
 ## Getting Started
 
