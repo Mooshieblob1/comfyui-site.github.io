@@ -35,7 +35,7 @@ This project is currently under active development. Features, content, and site 
 
 ```bash
 git clone https://github.com/Mooshieblob1/comfyui-site.github.io
-cd comfyui-guide
+cd comfyui-site.github.io
 ```
 
 2. Install dependencies:
