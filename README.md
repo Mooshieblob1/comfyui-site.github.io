@@ -2,6 +2,10 @@
 
 A comprehensive guide website built with Svelte and TailwindCSS to help users master ComfyUI and AI art creation. This project aims to provide tutorials, tips, and showcase community artwork.
 
+## 🚧 Work in Progress 🚧
+
+Please note that this project is currently under active development. Features, content, and site structure are subject to change as we continue to improve and expand the guide. We welcome feedback and contributions, but be aware that significant changes may occur during this development phase.
+
 ## Features
 
 - 📚 Comprehensive getting started guides
