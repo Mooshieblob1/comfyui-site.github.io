@@ -2,6 +2,11 @@
 	"name": "svelte-latest",
 	"version": "0.0.1",
 	"private": true,
+	"engines": {
+		"node": ">=18.0.0",
+		"pnpm": ">=8.0.0"
+	},
+	"packageManager": "pnpm@8.15.4",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -9,7 +14,10 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"lint": "prettier --check .",
+		"clean": "pnpm clean:build && pnpm clean:deps",
+		"clean:build": "rmdir /s /q .svelte-kit build",
+		"clean:deps": "rmdir /s /q node_modules && del pnpm-lock.yaml"
 	},
 	"type": "module",
 	"devDependencies": {
