@@ -16,5 +16,4 @@
 </footer>
 
 <!-- Add padding to prevent content from being hidden behind the footer -->
-<div class="pb-[52px]"></div>
-<!-- Adjust the padding value based on your footer's height -->
+<div class="pb-[60px]"><!-- Increased padding slightly for better spacing --></div>

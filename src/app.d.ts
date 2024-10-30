@@ -1,3 +1,6 @@
+/// <reference types="svelte" />
+/// <reference types="@sveltejs/kit" />
+
 // See https://svelte.dev/docs/kit/types#app
 // for information about these interfaces
 declare global {
