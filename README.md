@@ -29,6 +29,17 @@ This project is currently under active development. Features, content, and site 
 - [@tailwindcss/container-queries](https://github.com/tailwindlabs/tailwindcss-container-queries) - Container query support
 - [Adapter for Cloudflare](https://kit.svelte.dev/docs/adapters#supported-environments-cloudflare) - Deploy to Cloudflare
 
+## Prerequisites
+
+- Node.js 18 or higher
+- PNPM 8 or higher
+
+To install PNPM, run:
+
+```bash
+npm install -g pnpm
+```
+
 ## Local Development
 
 1. Clone the repository:
@@ -41,14 +52,14 @@ cd comfyui-site.github.io
 2. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 3. Start the development server:
 
 ```bash
-npm run dev
-# or: npm run dev -- --open
+pnpm dev
+# or: pnpm dev --open
 ```
 
 ## Project Structure
@@ -70,18 +81,28 @@ src/
     └── gallery/         # Community gallery
 ```
 
+## Available Scripts
+
+- `pnpm dev` - Start development server
+- `pnpm build` - Create production build
+- `pnpm preview` - Preview production build
+- `pnpm check` - Run Svelte type checking
+- `pnpm format` - Format code with Prettier
+- `pnpm lint` - Check code formatting
+- `pnpm clean` - Clean build files and dependencies
+
 ## Production Build
 
 Create a production build:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Preview the production build:
 
 ```bash
-npm run preview
+pnpm preview
 ```
 
 ## Contributing
@@ -92,6 +113,34 @@ I welcome contributions! Before submitting a Pull Request:
 2. Follow the existing code style and conventions
 3. Test your changes thoroughly
 4. Update documentation as needed
+
+### Development Setup
+
+1. Fork and clone the repository
+2. Install PNPM if you haven't already: `npm install -g pnpm`
+3. Install dependencies: `pnpm install`
+4. Create a new branch: `git checkout -b feature/your-feature-name`
+5. Make your changes
+6. Test your changes: `pnpm check`
+7. Format your code: `pnpm format`
+8. Submit your pull request
+
+## Troubleshooting
+
+### Common Issues
+
+1. If you get PNPM-related errors:
+
+   ```bash
+   pnpm store prune  # Clean the store
+   pnpm install      # Reinstall dependencies
+   ```
+
+2. If you need to reset your development environment:
+   ```bash
+   pnpm clean       # Clean build files and dependencies
+   pnpm install     # Reinstall everything
+   ```
 
 ## License
 
