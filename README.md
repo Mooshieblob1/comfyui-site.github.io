@@ -34,7 +34,7 @@ This project is currently under active development. Features, content, and site 
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Mooshieblob1/comfyui-site.github.io
 cd comfyui-guide
 ```
 
