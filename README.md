@@ -1,10 +1,10 @@
 # ComfyUI Guide
 
-A comprehensive guide website built with Svelte and TailwindCSS to help users master ComfyUI and AI art creation. This project aims to provide tutorials, tips, and showcase community artwork.
+A comprehensive guide website built with Svelte and TailwindCSS to help users master ComfyUI and AI art creation. The site provides tutorials, tips, and showcases community artwork.
 
 ## 🚧 Work in Progress 🚧
 
-Please note that this project is currently under active development. Features, content, and site structure are subject to change as we continue to improve and expand the guide. We welcome feedback and contributions, but be aware that significant changes may occur during this development phase.
+This project is currently under active development. Features, content, and site structure are subject to change as I continue to improve and expand the guide. I welcome feedback and contributions, but please note that significant changes may occur during this development phase.
 
 ## Features
 
@@ -14,6 +14,9 @@ Please note that this project is currently under active development. Features, c
 - 🖼️ Community gallery showcase
 - 🌓 Dark mode support
 - 📱 Responsive design
+- ⚡ Fast, static-first architecture
+- 🔍 Full-text search functionality
+- 📝 Markdown-based content
 
 ## Tech Stack
 
@@ -26,7 +29,7 @@ Please note that this project is currently under active development. Features, c
 - [@tailwindcss/container-queries](https://github.com/tailwindlabs/tailwindcss-container-queries) - Container query support
 - [Adapter for Cloudflare](https://kit.svelte.dev/docs/adapters#supported-environments-cloudflare) - Deploy to Cloudflare
 
-## Getting Started
+## Local Development
 
 1. Clone the repository:
 ```bash
@@ -37,17 +40,12 @@ cd comfyui-guide
 2. Install dependencies:
 ```bash
 npm install
-# or
-pnpm install
-# or
-yarn install
 ```
 
 3. Start the development server:
 ```bash
 npm run dev
-# or
-npm run dev -- --open
+# or: npm run dev -- --open
 ```
 
 ## Project Structure
@@ -59,7 +57,9 @@ src/
 │   ├── components/        # Reusable components
 │   │   ├── layout/       # Layout components (Navbar, PageWrapper)
 │   │   └── shared/       # Shared components (FeatureCard, ThemeToggle)
-│   └── stores/           # Svelte stores (theme)
+│   ├── stores/           # Svelte stores (theme, search)
+│   ├── utils/            # Utility functions
+│   └── content/          # Markdown content files
 └── routes/               # SvelteKit routes
     ├── getting-started/  # Getting started guide
     ├── tutorials/        # Tutorial pages
@@ -67,23 +67,26 @@ src/
     └── gallery/         # Community gallery
 ```
 
-## Building for Production
+## Production Build
 
-To create a production version of your app:
-
+Create a production build:
 ```bash
 npm run build
 ```
 
-Preview the production build with:
-
+Preview the production build:
 ```bash
 npm run preview
 ```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+I welcome contributions! Before submitting a Pull Request:
+
+1. Open an issue to discuss proposed changes
+2. Follow the existing code style and conventions
+3. Test your changes thoroughly
+4. Update documentation as needed
 
 ## License
 
@@ -91,5 +94,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Acknowledgments
 
-- ComfyUI community for inspiration and resources
-- All contributors and users of this guide
+- The amazing ComfyUI community for inspiration and resources
+- All contributors who help improve this guide
+- You, for checking out this project!
+
+## Contact
+
+Found a bug or have a suggestion? Please open an issue or reach out to me at [blob@mooshieblob.com].
