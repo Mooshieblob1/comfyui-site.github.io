@@ -32,17 +32,20 @@ This project is currently under active development. Features, content, and site 
 ## Local Development
 
 1. Clone the repository:
+
 ```bash
 git clone <your-repo-url>
 cd comfyui-guide
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 npm run dev
 # or: npm run dev -- --open
@@ -70,11 +73,13 @@ src/
 ## Production Build
 
 Create a production build:
+
 ```bash
 npm run build
 ```
 
 Preview the production build:
+
 ```bash
 npm run preview
 ```
@@ -100,4 +105,4 @@ I welcome contributions! Before submitting a Pull Request:
 
 ## Contact
 
-Found a bug or have a suggestion? Please open an issue or reach out to me at [blob@mooshieblob.com].
+Found a bug or have a suggestion? Please open an issue or reach out to me at blob@mooshieblob.com.
