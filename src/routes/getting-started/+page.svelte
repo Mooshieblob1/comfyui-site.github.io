@@ -3,19 +3,16 @@
 	import Navbar from '$lib/components/layout/Navbar.svelte';
 	import PageWrapper from '$lib/components/layout/PageWrapper.svelte';
 	import { ClipboardCopy } from 'lucide-svelte';
-
 	interface CodeStep {
 		text: string;
 		code: string;
 	}
-
 	interface Section {
 		title: string;
 		content: string;
 		steps?: (string | CodeStep)[];
 		topics?: string[];
 	}
-
 	const sections: Section[] = [
 		{
 			title: 'Installation',
@@ -37,7 +34,6 @@
 			topics: ['Node system basics', 'Workflow creation', 'Model loading', 'Image generation']
 		}
 	];
-
 	const copyToClipboard = (text: string) => {
 		navigator.clipboard.writeText(text);
 	};
@@ -52,45 +48,30 @@
 					class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-6 py-4"
 				>
 					<h2 class="text-xl font-semibold text-gray-900 dark:text-white">{section.title}</h2>
-					<p class="mt-2 text-gray-600 dark:text-gray-300">{section.content}</p>
+					<p class="text-gray-600 dark:text-gray-300">{section.content}</p>
 				</div>
-
-				<div class="p-6">
+				<div class="p-6 space-y-4">
 					{#if section.steps}
-						<div class="space-y-4">
-							{#each section.steps as step, i}
-								<div class="relative pl-8">
-									<div
-										class="absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 text-sm font-medium"
-									>
-										{i + 1}
-									</div>
+						<ol class="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-200">
+							{#each section.steps as step}
+								<li>
 									{#if typeof step === 'string'}
-										<p class="text-gray-700 dark:text-gray-200">{step}</p>
+										{step}
 									{:else}
-										<div>
-											<p class="text-gray-700 dark:text-gray-200 mb-2">{step.text}</p>
-											<div class="relative group">
-												<div class="flex items-center gap-2 mb-2">
-													<button
-														type="button"
-														class="p-1.5 rounded-md bg-gray-800 text-gray-400 hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-														on:click={() => copyToClipboard(step.code)}
-														aria-label="Copy code to clipboard"
-													>
-														<ClipboardCopy class="w-4 h-4" />
-													</button>
-													<span class="text-sm text-gray-500 dark:text-gray-400">Copy command</span>
-												</div>
-												<pre class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-            <code class="text-sm font-mono text-gray-200">{step.code}</code>
-        </pre>
-											</div>
+										<div class="flex items-center justify-between">
+											<span>{step.text}</span>
+											<button
+												on:click={() => copyToClipboard(step.code)}
+												class="text-blue-500 hover:underline"
+											>
+												<ClipboardCopy class="inline-block w-5 h-5 mr-1" /> Copy
+											</button>
 										</div>
+										<pre class="bg-gray-100 dark:bg-gray-900 rounded p-2 text-sm">{step.code}</pre>
 									{/if}
-								</div>
+								</li>
 							{/each}
-						</div>
+						</ol>
 					{/if}
 					{#if section.topics}
 						<div class="grid gap-4 sm:grid-cols-2">

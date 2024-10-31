@@ -10,6 +10,23 @@
   const duration = 200;
 </script>
 
+<!-- FILEPATH: /home/mooshieblob/comfyui-site.github.io/src/lib/components/layout/PageTransition.svelte -->
+
+<!--
+  This component provides a transition effect for the page content.
+  It animates the content when it enters or exits the page.
+
+  Props:
+  - $page.url.pathname: The current URL pathname.
+
+  Slots:
+  - Default: The content to be transitioned.
+
+  Example usage:
+  <PageTransition>
+    <h1>Welcome to my website!</h1>
+  </PageTransition>
+-->
 {#key $page.url.pathname}
   <div
     in:fly={{ y: 20, duration, delay: duration, easing: cubicInOut }}
