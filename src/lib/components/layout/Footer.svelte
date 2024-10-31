@@ -1,3 +1,17 @@
+<!--
+
+	This Svelte component represents a footer layout for a web application. It includes the following features:
+	- Displays a copyright notice with a dynamic year range.
+	- The year range starts from 2024 and updates to the current year if it is greater than 2024.
+	- The footer is fixed at the bottom of the page and adapts to light and dark themes.
+	- Includes padding at the bottom of the content to prevent it from being hidden behind the footer.
+
+	Props:
+	- None
+
+	Dependencies:
+	- None
+-->
 <!-- src/lib/components/layout/Footer.svelte -->
 <script lang="ts">
 	const startYear = 2024;
