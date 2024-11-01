@@ -8,7 +8,11 @@ export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	darkMode: 'class',
 	theme: {
-		extend: {}
+		extend: {
+			colors: {
+				blobyellow: '#FFCC00'
+			}
+		}
 	},
 
 	plugins: [typography, forms, containerQueries, aspectRatio]
