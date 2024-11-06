@@ -9,6 +9,11 @@
 		id: number;
 		file_url: string;
 		tag_string_general: string;
+		tag_string_character: string;
+		tag_string_copyright: string;
+		tag_string_artist: string;
+		tag_string_meta: string;
+		tag_string_model: string;
 		score: number;
 		rating: string;
 	}
@@ -38,7 +43,15 @@
 	// Format the posts data for the lightbox
 	$: lightboxImages = posts.map((post) => ({
 		url: post.file_url,
-		alt: post.tag_string_general
+		alt: post.tag_string_general,
+		tags: {
+			general: post.tag_string_general,
+			character: post.tag_string_character,
+			copyright: post.tag_string_copyright,
+			artist: post.tag_string_artist,
+			meta: post.tag_string_meta,
+			model: post.tag_string_model
+		}
 	}));
 
 	function handleImageClick(index: number) {
