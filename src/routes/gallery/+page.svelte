@@ -5,6 +5,14 @@
 	import { Loader2 } from 'lucide-svelte';
 	import ImageLightbox from '$lib/components/shared/ImageLightbox.svelte';
 
+	interface ImageVariant {
+		type: string;
+		url: string;
+		width: number;
+		height: number;
+		file_ext: string;
+	}
+
 	interface AIPost {
 		id: number;
 		file_url: string;
@@ -16,12 +24,33 @@
 		tag_string_model: string;
 		score: number;
 		rating: string;
+		media_asset: {
+			variants: ImageVariant[];
+		};
 	}
 
 	let posts: AIPost[] = [];
 	let loading = true;
 	let error: string | null = null;
 	let selectedImageIndex: number | null = null;
+
+	// Helper function to get the 720p WebP preview image URL
+	function getPreviewUrl(post: AIPost): string {
+		if (!post.media_asset?.variants) return post.file_url;
+
+		// Find the 720x720 WebP variant for preview
+		const previewVariant = post.media_asset.variants.find((v) => v.type === '720x720');
+		return previewVariant?.url || post.file_url;
+	}
+
+	// Helper function to get the original full resolution image URL
+	function getLightboxUrl(post: AIPost): string {
+		if (!post.media_asset?.variants) return post.file_url;
+
+		// Find the original full resolution variant
+		const originalVariant = post.media_asset.variants.find((v) => v.type === 'original');
+		return originalVariant?.url || post.file_url;
+	}
 
 	async function fetchPosts() {
 		try {
@@ -42,7 +71,7 @@
 
 	// Format the posts data for the lightbox
 	$: lightboxImages = posts.map((post) => ({
-		url: post.file_url,
+		url: getLightboxUrl(post),
 		alt: post.tag_string_general,
 		tags: {
 			general: post.tag_string_general,
@@ -85,18 +114,12 @@
 					tabindex="0"
 				>
 					<div class="aspect-w-3 aspect-h-4 bg-gray-100 dark:bg-gray-700">
-						{#if post.file_url}
-							<img
-								src={post.file_url}
-								alt={post.tag_string_general}
-								class="object-cover w-full h-full"
-								loading="lazy"
-							/>
-						{:else}
-							<div class="flex items-center justify-center text-gray-400 dark:text-gray-500">
-								<span>No preview available</span>
-							</div>
-						{/if}
+						<img
+							src={getPreviewUrl(post)}
+							alt={post.tag_string_general}
+							class="object-cover w-full h-full"
+							loading="lazy"
+						/>
 					</div>
 					<div class="p-3">
 						<h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
