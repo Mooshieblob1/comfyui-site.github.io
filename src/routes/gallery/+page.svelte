@@ -33,7 +33,7 @@
 		}
 	}
 
-	// Fetch posts when component mounts
+	// Fetch posts when component is mounted
 	fetchPosts();
 </script>
 
