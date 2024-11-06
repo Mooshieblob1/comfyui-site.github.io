@@ -19,9 +19,7 @@
 	async function fetchPosts() {
 		try {
 			loading = true;
-			const response = await fetch(
-				'https://aibooru.online/posts.json?limit=20&tags=rating:general'
-			);
+			const response = await fetch('https://aibooru.online/posts.json?tags=rating:general');
 			if (!response.ok) {
 				throw new Error('Failed to fetch posts');
 			}
