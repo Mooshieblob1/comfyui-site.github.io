@@ -3,6 +3,7 @@
 	import Navbar from '$lib/components/layout/Navbar.svelte';
 	import PageWrapper from '$lib/components/layout/PageWrapper.svelte';
 	import { Loader2 } from 'lucide-svelte';
+	import ImageLightbox from '$lib/components/shared/ImageLightbox.svelte';
 
 	interface AIPost {
 		id: number;
@@ -15,12 +16,13 @@
 	let posts: AIPost[] = [];
 	let loading = true;
 	let error: string | null = null;
+	let selectedImageIndex: number | null = null;
 
 	async function fetchPosts() {
 		try {
 			loading = true;
 			const response = await fetch(
-				'https://aibooru.online/posts.json?tags=rating%3Ageneral+blob_%28artist%29+comfyui'
+				'https://aibooru.online/posts.json?tags=rating%3Ageneral+blob_%28artist%29+~illustrious-xl+~comfyui'
 			);
 			if (!response.ok) {
 				throw new Error('Failed to fetch posts');
@@ -33,7 +35,17 @@
 		}
 	}
 
-	// Fetch posts when component is mounted
+	// Format the posts data for the lightbox
+	$: lightboxImages = posts.map((post) => ({
+		url: post.file_url,
+		alt: post.tag_string_general
+	}));
+
+	function handleImageClick(index: number) {
+		selectedImageIndex = index;
+	}
+
+	// Fetch posts when component mounts
 	fetchPosts();
 </script>
 
@@ -51,9 +63,13 @@
 		</div>
 	{:else}
 		<div class="pb-6 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-			{#each posts as post}
+			{#each posts as post, index}
 				<div
-					class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300"
+					class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+					on:click={() => handleImageClick(index)}
+					on:keydown={(e) => e.key === 'Enter' && handleImageClick(index)}
+					role="button"
+					tabindex="0"
 				>
 					<div class="aspect-w-3 aspect-h-4 bg-gray-100 dark:bg-gray-700">
 						{#if post.file_url}
@@ -86,3 +102,11 @@
 		</div>
 	{/if}
 </PageWrapper>
+
+{#if selectedImageIndex !== null}
+	<ImageLightbox
+		images={lightboxImages}
+		initialIndex={selectedImageIndex}
+		onClose={() => (selectedImageIndex = null)}
+	/>
+{/if}
