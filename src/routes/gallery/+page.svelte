@@ -19,7 +19,9 @@
 	async function fetchPosts() {
 		try {
 			loading = true;
-			const response = await fetch('https://aibooru.online/posts.json?tags=rating:general%20blob_(artist)');
+			const response = await fetch(
+				'https://aibooru.online/posts?tags=rating%3Ageneral+blob_%28artist%29+~illustrious-xl+~comfyui'
+			);
 			if (!response.ok) {
 				throw new Error('Failed to fetch posts');
 			}
