@@ -12,7 +12,10 @@
 	];
 </script>
 
-<nav class="bg-white dark:bg-gray-800 shadow-lg mb-6">
+<nav
+	class="bg-white dark:bg-gray-800 shadow-lg mb-6"
+	style="box-shadow: 0 0 10px rgba(99, 102, 241, 0.575);"
+>
 	<div class="max-w-7xl mx-auto px-4 py-2">
 		<div class="flex justify-between h-16">
 			<div class="flex">
