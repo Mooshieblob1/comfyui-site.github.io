@@ -1,5 +1,6 @@
 <!-- src/lib/components/shared/ImageLightbox.svelte -->
 <script lang="ts">
+	import { crossfade } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { X, ChevronLeft, ChevronRight } from 'lucide-svelte';
 
@@ -20,6 +21,32 @@
 
 	let currentIndex = initialIndex;
 	$: currentImage = images[currentIndex];
+
+	let mainImage: HTMLImageElement;
+	let isLoading = false;
+
+	const [send, receive] = crossfade({ duration: 500 });
+
+	// Get indices of images to preload
+	$: preloadIndices = [
+		currentIndex - 3,
+		currentIndex - 2,
+		currentIndex - 1,
+		currentIndex + 1,
+		currentIndex + 2,
+		currentIndex + 3
+	].filter((i) => i >= 0 && i < images.length);
+
+	// Handle image loading state
+	function handleImageLoad() {
+		isLoading = false;
+	}
+
+	// Update loading state when changing images
+	$: {
+		currentImage;
+		isLoading = true;
+	}
 
 	function formatTags(tagString: string): string[] {
 		return tagString.split(' ').filter((tag) => tag.length > 0);
@@ -43,6 +70,19 @@
 		if (e.key === 'ArrowRight') handleNext();
 	}
 
+	function handleBackgroundClick(e: MouseEvent) {
+		// Only close if clicking directly on the background
+		if (e.target === e.currentTarget) {
+			onClose();
+		}
+	}
+
+	function handleBackgroundKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			onClose();
+		}
+	}
+
 	onMount(() => {
 		document.body.style.overflow = 'hidden';
 		window.addEventListener('keydown', handleKeydown);
@@ -52,9 +92,31 @@
 		document.body.style.overflow = 'unset';
 		window.removeEventListener('keydown', handleKeydown);
 	});
+
+	// Preload images function
+	function preloadImages(indices: number[]) {
+		indices.forEach((index) => {
+			if (index >= 0 && index < images.length) {
+				const img = new Image();
+				img.src = images[index].url;
+				img.classList.add('hidden-preload'); // Add a class to hide preloaded images
+				document.body.appendChild(img); // Append to the body to ensure they are rendered
+			}
+		});
+	}
+
+	// Reactive statement to trigger preloading when currentIndex changes
+	$: {
+		const indicesToPreload = [currentIndex + 1, currentIndex + 2, currentIndex + 3];
+		preloadImages(indicesToPreload);
+	}
 </script>
 
-<div class="fixed inset-0 z-50 bg-black/90 flex">
+<dialog
+	class="fixed inset-0 z-50 bg-black/90 flex w-full h-full m-0 p-0"
+	aria-label="Image lightbox"
+	open
+>
 	<!-- Close button -->
 	<button on:click={onClose} class="absolute top-4 right-4 p-2 text-white hover:text-gray-300 z-50">
 		<X class="w-6 h-6" />
@@ -82,14 +144,24 @@
 			</button>
 
 			<!-- Image -->
-			<img
-				src={currentImage.url}
-				alt={currentImage.alt}
-				class="max-h-full max-w-full object-contain"
-			/>
+			<div class="relative w-full h-full flex items-center justify-center">
+				<div class="absolute inset-0 flex items-center justify-center">
+					{#each [currentImage] as image (currentIndex)}
+						<img
+							bind:this={mainImage}
+							src={image.url}
+							alt={image.alt}
+							class="max-h-full max-w-full absolute"
+							in:send={{ key: currentIndex }}
+							out:receive={{ key: currentIndex }}
+							on:load={handleImageLoad}
+						/>
+					{/each}
+				</div>
+			</div>
 
 			<!-- Image counter -->
-			<div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white">
+			<div class="absolute bottom-4 left-0 right-[550px] text-center text-white">
 				{currentIndex + 1} / {images.length}
 			</div>
 		</div>
@@ -165,4 +237,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</dialog>
+
+<style>
+</style>

@@ -1,5 +1,6 @@
 <!-- src/routes/gallery/+page.svelte -->
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Navbar from '$lib/components/layout/Navbar.svelte';
 	import PageWrapper from '$lib/components/layout/PageWrapper.svelte';
 	import { Loader2 } from 'lucide-svelte';
@@ -88,7 +89,9 @@
 	}
 
 	// Fetch posts when component mounts
-	fetchPosts();
+	onMount(() => {
+		fetchPosts();
+	});
 </script>
 
 <Navbar activeSection="gallery" />
