@@ -56,7 +56,7 @@
 		try {
 			loading = true;
 			const response = await fetch(
-				'https://aibooru.online/posts.json?tags=rating%3Ageneral+blob_%28artist%29+~illustrious-xl+~comfyui'
+				'https://aibooru.online/posts.json?tags=rating%3Ageneral+blob_%28artist%29+comfyui'
 			);
 			if (!response.ok) {
 				throw new Error('Failed to fetch posts');
