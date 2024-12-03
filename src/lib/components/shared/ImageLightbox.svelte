@@ -91,6 +91,8 @@
 	onDestroy(() => {
 		document.body.style.overflow = 'unset';
 		window.removeEventListener('keydown', handleKeydown);
+		// Clean up preloaded images
+		document.querySelectorAll('.hidden-preload').forEach((img) => img.remove());
 	});
 
 	// Preload images function
