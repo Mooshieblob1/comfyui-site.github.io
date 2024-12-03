@@ -1,10 +1,13 @@
+The recent changes include migrating the project from NPM to PNPM, updating repository URLs, and modifying project setup instructions. Here is the updated content for the README.md file:
+
+```markdown
 # ComfyUI Guide
 
 A comprehensive guide website built with Svelte and TailwindCSS to help users master ComfyUI and AI art creation. The site provides tutorials, tips, and showcases community artwork.
 
 ## 🚧 Work in Progress 🚧
 
-This project is currently under active development. Features, content, and site structure are subject to change as I continue to improve and expand the guide. I welcome feedback and contributions, but please note that significant changes may occur during this development phase.
+This project is currently under active development. Features, content, and site structure are subject to change as I continue to improve and expand the guide. I welcome feedback and contributions, but please be aware that things might break or change frequently.
 
 ## Features
 
@@ -12,7 +15,7 @@ This project is currently under active development. Features, content, and site 
 - 🎨 Interactive tutorials for AI art creation
 - 💡 Tips & tricks for optimal results
 - 🖼️ Community gallery showcase
-- 🌓 Dark mode support
+- 🌙 Dark mode support
 - 📱 Responsive design
 - ⚡ Fast, static-first architecture
 - 🔍 Full-text search functionality
@@ -77,8 +80,8 @@ src/
 └── routes/               # SvelteKit routes
     ├── getting-started/  # Getting started guide
     ├── tutorials/        # Tutorial pages
-    ├── tricks/          # Tips & tricks
-    └── gallery/         # Community gallery
+    ├── tricks/           # Tips & tricks
+    └── gallery/          # Community gallery
 ```
 
 ## Available Scripts
@@ -155,3 +158,6 @@ I welcome contributions! Before submitting a Pull Request:
 ## Contact
 
 Found a bug or have a suggestion? Please open an issue or reach out to me at blob@mooshieblob.com.
+```
+
+You can now commit and push the updated README.md file to the main branch.
