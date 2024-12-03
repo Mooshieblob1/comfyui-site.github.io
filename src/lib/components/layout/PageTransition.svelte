@@ -1,16 +1,14 @@
 <!-- src/lib/components/layout/PageTransition.svelte -->
 <script lang="ts">
-	import { fly, fade } from 'svelte/transition';
-	import { cubicInOut } from 'svelte/easing';
+  import { fly, fade } from 'svelte/transition';
+  import { cubicInOut } from 'svelte/easing';
 
-	// Get current URL to use as a key for the transition
-	import { page } from '$app/stores';
+  // Get current URL to use as a key for the transition
+  import { page } from '$app/stores';
 
-	// Transition duration
-	const duration = 200;
+  // Transition duration
+  const duration = 200;
 </script>
-
-<!-- FILEPATH: /home/mooshieblob/comfyui-site.github.io/src/lib/components/layout/PageTransition.svelte -->
 
 <!--
   This component provides a transition effect for the page content.
