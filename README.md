@@ -1,6 +1,3 @@
-The recent changes include migrating the project from NPM to PNPM, updating repository URLs, and modifying project setup instructions. Here is the updated content for the README.md file:
-
-```markdown
 # ComfyUI Guide
 
 A comprehensive guide website built with Svelte and TailwindCSS to help users master ComfyUI and AI art creation. The site provides tutorials, tips, and showcases community artwork.
@@ -158,6 +155,3 @@ I welcome contributions! Before submitting a Pull Request:
 ## Contact
 
 Found a bug or have a suggestion? Please open an issue or reach out to me at blob@mooshieblob.com.
-```
-
-You can now commit and push the updated README.md file to the main branch.
