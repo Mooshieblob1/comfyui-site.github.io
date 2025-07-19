@@ -147,7 +147,7 @@
 				</button>
 
 				{#if openSections[section.category]}
-					<div class="px-6 pb-6 space-y-4 border-t border-gray-200 dark:border-gray-700">
+					<div class="px-6 pt-4 pb-6 space-y-4 border-t border-gray-200 dark:border-gray-700">
 						{#each section.items as item}
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
 								<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
