@@ -18,24 +18,23 @@
 	}[];
 	export let initialIndex = 0;
 	export let onClose: () => void;
+	export let onTagClick: ((tag: string) => void) | undefined = undefined;
 
 	let currentIndex = initialIndex;
 	$: currentImage = images[currentIndex];
 
 	let mainImage: HTMLImageElement;
 	let isLoading = false;
+	let preloadedImages = new Set<number>();
+	let clickedTag: string | null = null;
+	let tagFeedbackTimeout: number | null = null;
 
 	const [send, receive] = crossfade({ duration: 500 });
 
-	// Get indices of images to preload
-	$: preloadIndices = [
-		currentIndex - 3,
-		currentIndex - 2,
-		currentIndex - 1,
-		currentIndex + 1,
-		currentIndex + 2,
-		currentIndex + 3
-	].filter((i) => i >= 0 && i < images.length);
+	// Get indices of images to preload (reduced range for better performance)
+	$: preloadIndices = [currentIndex - 1, currentIndex + 1, currentIndex + 2].filter(
+		(i) => i >= 0 && i < images.length && !preloadedImages.has(i)
+	);
 
 	// Handle image loading state
 	function handleImageLoad() {
@@ -50,6 +49,26 @@
 
 	function formatTags(tagString: string): string[] {
 		return tagString.split(' ').filter((tag) => tag.length > 0);
+	}
+
+	function handleTagClick(tag: string) {
+		if (onTagClick) {
+			onTagClick(tag);
+
+			// Show feedback
+			clickedTag = tag;
+
+			// Clear any existing timeout
+			if (tagFeedbackTimeout) {
+				clearTimeout(tagFeedbackTimeout);
+			}
+
+			// Clear feedback after 2 seconds
+			tagFeedbackTimeout = setTimeout(() => {
+				clickedTag = null;
+				tagFeedbackTimeout = null;
+			}, 2000);
+		}
 	}
 
 	function handlePrevious() {
@@ -91,26 +110,41 @@
 	onDestroy(() => {
 		document.body.style.overflow = 'unset';
 		window.removeEventListener('keydown', handleKeydown);
-		// Clean up preloaded images
-		document.querySelectorAll('.hidden-preload').forEach((img) => img.remove());
+		// Clear preloaded images set
+		preloadedImages.clear();
+		// Clear tag feedback timeout
+		if (tagFeedbackTimeout) {
+			clearTimeout(tagFeedbackTimeout);
+		}
 	});
 
-	// Preload images function
+	// Preload images function with better memory management
 	function preloadImages(indices: number[]) {
 		indices.forEach((index) => {
-			if (index >= 0 && index < images.length) {
+			if (index >= 0 && index < images.length && !preloadedImages.has(index)) {
 				const img = new Image();
 				img.src = images[index].url;
-				img.classList.add('hidden-preload'); // Add a class to hide preloaded images
-				document.body.appendChild(img); // Append to the body to ensure they are rendered
+				img.onload = () => {
+					preloadedImages.add(index);
+				};
+				img.onerror = () => {
+					console.warn(`Failed to preload image at index ${index}`);
+				};
+				// Don't append to DOM, just keep in memory
 			}
 		});
 	}
 
 	// Reactive statement to trigger preloading when currentIndex changes
 	$: {
-		const indicesToPreload = [currentIndex + 1, currentIndex + 2, currentIndex + 3];
-		preloadImages(indicesToPreload);
+		if (preloadIndices.length > 0) {
+			// Use requestIdleCallback for better performance, fallback to setTimeout
+			if ('requestIdleCallback' in window) {
+				requestIdleCallback(() => preloadImages(preloadIndices));
+			} else {
+				setTimeout(() => preloadImages(preloadIndices), 100);
+			}
+		}
 	}
 </script>
 
@@ -123,6 +157,17 @@
 	<button on:click={onClose} class="absolute top-4 right-4 p-2 text-white hover:text-gray-300 z-50">
 		<X class="w-6 h-6" />
 	</button>
+
+	<!-- Tag added feedback toast -->
+	{#if clickedTag}
+		<div
+			class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce"
+		>
+			<div class="flex items-center gap-2">
+				<span class="text-sm">✓ Added "{clickedTag}" to filter</span>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Main content area -->
 	<div class="flex flex-1">
@@ -147,16 +192,28 @@
 
 			<!-- Image -->
 			<div class="relative w-full h-full flex items-center justify-center">
+				{#if isLoading}
+					<div class="absolute inset-0 flex items-center justify-center">
+						<div
+							class="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"
+						></div>
+					</div>
+				{/if}
 				<div class="absolute inset-0 flex items-center justify-center">
 					{#each [currentImage] as image (currentIndex)}
 						<img
 							bind:this={mainImage}
 							src={image.url}
 							alt={image.alt}
-							class="max-h-full max-w-full absolute"
+							class="max-h-full max-w-full absolute transition-opacity duration-300"
+							class:opacity-0={isLoading}
+							class:opacity-100={!isLoading}
 							in:send={{ key: currentIndex }}
 							out:receive={{ key: currentIndex }}
 							on:load={handleImageLoad}
+							on:error={() => (isLoading = false)}
+							loading="eager"
+							decoding="async"
 						/>
 					{/each}
 				</div>
@@ -177,9 +234,20 @@
 				<h3 class="text-white font-semibold mb-3">Artist</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each formatTags(currentImage.tags.artist) as tag}
-						<code class="bg-purple-500/20 text-purple-200 px-3 py-1.5 rounded-full text-sm"
-							>{tag}</code
+						<button
+							on:click={() => handleTagClick(tag)}
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
+								{clickedTag === tag
+								? 'bg-green-500/40 text-green-100 scale-105'
+								: 'bg-purple-500/20 text-purple-200 hover:bg-purple-500/30'}"
+							class:cursor-pointer={onTagClick}
+							disabled={!onTagClick}
 						>
+							{tag}
+							{#if clickedTag === tag}
+								<span class="absolute -top-1 -right-1 text-xs">✓</span>
+							{/if}
+						</button>
 					{/each}
 				</div>
 			</div>
@@ -189,7 +257,20 @@
 				<h3 class="text-white font-semibold mb-3">Character</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each formatTags(currentImage.tags.character) as tag}
-						<code class="bg-blue-500/20 text-blue-200 px-3 py-1.5 rounded-full text-sm">{tag}</code>
+						<button
+							on:click={() => handleTagClick(tag)}
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
+								{clickedTag === tag
+								? 'bg-green-500/40 text-green-100 scale-105'
+								: 'bg-blue-500/20 text-blue-200 hover:bg-blue-500/30'}"
+							class:cursor-pointer={onTagClick}
+							disabled={!onTagClick}
+						>
+							{tag}
+							{#if clickedTag === tag}
+								<span class="absolute -top-1 -right-1 text-xs">✓</span>
+							{/if}
+						</button>
 					{/each}
 				</div>
 			</div>
@@ -199,9 +280,20 @@
 				<h3 class="text-white font-semibold mb-3">Copyright</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each formatTags(currentImage.tags.copyright) as tag}
-						<code class="bg-yellow-500/20 text-yellow-200 px-3 py-1.5 rounded-full text-sm"
-							>{tag}</code
+						<button
+							on:click={() => handleTagClick(tag)}
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
+								{clickedTag === tag
+								? 'bg-green-500/40 text-green-100 scale-105'
+								: 'bg-yellow-500/20 text-yellow-200 hover:bg-yellow-500/30'}"
+							class:cursor-pointer={onTagClick}
+							disabled={!onTagClick}
 						>
+							{tag}
+							{#if clickedTag === tag}
+								<span class="absolute -top-1 -right-1 text-xs">✓</span>
+							{/if}
+						</button>
 					{/each}
 				</div>
 			</div>
@@ -211,9 +303,20 @@
 				<h3 class="text-white font-semibold mb-3">Model</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each formatTags(currentImage.tags.model) as tag}
-						<code class="bg-green-500/20 text-green-200 px-3 py-1.5 rounded-full text-sm"
-							>{tag}</code
+						<button
+							on:click={() => handleTagClick(tag)}
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
+								{clickedTag === tag
+								? 'bg-green-500/40 text-green-100 scale-105'
+								: 'bg-green-500/20 text-green-200 hover:bg-green-500/30'}"
+							class:cursor-pointer={onTagClick}
+							disabled={!onTagClick}
 						>
+							{tag}
+							{#if clickedTag === tag}
+								<span class="absolute -top-1 -right-1 text-xs">✓</span>
+							{/if}
+						</button>
 					{/each}
 				</div>
 			</div>
@@ -223,7 +326,20 @@
 				<h3 class="text-white font-semibold mb-3">Meta</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each formatTags(currentImage.tags.meta) as tag}
-						<code class="bg-gray-500/20 text-gray-200 px-3 py-1.5 rounded-full text-sm">{tag}</code>
+						<button
+							on:click={() => handleTagClick(tag)}
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
+								{clickedTag === tag
+								? 'bg-green-500/40 text-green-100 scale-105'
+								: 'bg-gray-500/20 text-gray-200 hover:bg-gray-500/30'}"
+							class:cursor-pointer={onTagClick}
+							disabled={!onTagClick}
+						>
+							{tag}
+							{#if clickedTag === tag}
+								<span class="absolute -top-1 -right-1 text-xs">✓</span>
+							{/if}
+						</button>
 					{/each}
 				</div>
 			</div>
@@ -233,7 +349,20 @@
 				<h3 class="text-white font-semibold mb-3">General</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each formatTags(currentImage.tags.general) as tag}
-						<code class="bg-red-500/20 text-red-200 px-3 py-1.5 rounded-full text-sm">{tag}</code>
+						<button
+							on:click={() => handleTagClick(tag)}
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
+								{clickedTag === tag
+								? 'bg-green-500/40 text-green-100 scale-105'
+								: 'bg-red-500/20 text-red-200 hover:bg-red-500/30'}"
+							class:cursor-pointer={onTagClick}
+							disabled={!onTagClick}
+						>
+							{tag}
+							{#if clickedTag === tag}
+								<span class="absolute -top-1 -right-1 text-xs">✓</span>
+							{/if}
+						</button>
 					{/each}
 				</div>
 			</div>
