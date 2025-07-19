@@ -19,6 +19,7 @@
 	export let initialIndex = 0;
 	export let onClose: () => void;
 	export let onTagClick: ((tag: string) => void) | undefined = undefined;
+	export let selectedTags: Set<string> = new Set();
 
 	let currentIndex = initialIndex;
 	$: currentImage = images[currentIndex];
@@ -26,7 +27,7 @@
 	let mainImage: HTMLImageElement;
 	let isLoading = false;
 	let preloadedImages = new Set<number>();
-	let clickedTag: string | null = null;
+	let tagFeedback: { tag: string; action: 'added' | 'removed' } | null = null;
 	let tagFeedbackTimeout: number | null = null;
 
 	const [send, receive] = crossfade({ duration: 500 });
@@ -51,23 +52,35 @@
 		return tagString.split(' ').filter((tag) => tag.length > 0);
 	}
 
+	// Format tag for display (remove underscores)
+	function formatTagDisplay(tag: string): string {
+		return tag.replace(/_/g, ' ');
+	}
+
 	function handleTagClick(tag: string) {
 		if (onTagClick) {
-			onTagClick(tag);
+			const normalizedTag = tag.toLowerCase().trim();
+			const wasSelected = selectedTags.has(normalizedTag);
 
-			// Show feedback
-			clickedTag = tag;
+			onTagClick(tag);
 
 			// Clear any existing timeout
 			if (tagFeedbackTimeout) {
 				clearTimeout(tagFeedbackTimeout);
+				tagFeedbackTimeout = null;
 			}
 
-			// Clear feedback after 2 seconds
+			// Show feedback based on whether tag was added or removed
+			tagFeedback = {
+				tag: tag,
+				action: wasSelected ? 'removed' : 'added'
+			};
+
+			// Clear feedback after 2.5 seconds
 			tagFeedbackTimeout = setTimeout(() => {
-				clickedTag = null;
+				tagFeedback = null;
 				tagFeedbackTimeout = null;
-			}, 2000);
+			}, 2500);
 		}
 	}
 
@@ -158,13 +171,22 @@
 		<X class="w-6 h-6" />
 	</button>
 
-	<!-- Tag added feedback toast -->
-	{#if clickedTag}
+	<!-- Tag feedback toast -->
+	{#if tagFeedback}
 		<div
-			class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce"
+			class="absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 {tagFeedback.action ===
+			'added'
+				? 'bg-green-500/90 text-white'
+				: 'bg-red-500/90 text-white'}"
+			style="animation: slideDown 0.3s ease-out;"
 		>
 			<div class="flex items-center gap-2">
-				<span class="text-sm">✓ Added "{clickedTag}" to filter</span>
+				<span class="text-sm">
+					{tagFeedback.action === 'added' ? '✓' : '✗'}
+					{tagFeedback.action === 'added' ? 'Added' : 'Removed'}
+					"{formatTagDisplay(tagFeedback.tag)}"
+					{tagFeedback.action === 'added' ? 'to' : 'from'} filter
+				</span>
 			</div>
 		</div>
 	{/if}
@@ -177,7 +199,7 @@
 			<button
 				on:click={handlePrevious}
 				disabled={currentIndex === 0}
-				class="absolute left-4 p-2 text-white hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+				class="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 text-white hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed bg-black/30 rounded-full hover:bg-black/50 transition-all duration-200 z-10"
 			>
 				<ChevronLeft class="w-8 h-8" />
 			</button>
@@ -185,7 +207,7 @@
 			<button
 				on:click={handleNext}
 				disabled={currentIndex === images.length - 1}
-				class="absolute right-[566px] p-2 text-white hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+				class="absolute right-[570px] top-1/2 transform -translate-y-1/2 p-3 text-white hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed bg-black/30 rounded-full hover:bg-black/50 transition-all duration-200 z-10"
 			>
 				<ChevronRight class="w-8 h-8" />
 			</button>
@@ -236,17 +258,14 @@
 					{#each formatTags(currentImage.tags.artist) as tag}
 						<button
 							on:click={() => handleTagClick(tag)}
-							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
-								{clickedTag === tag
-								? 'bg-green-500/40 text-green-100 scale-105'
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer
+								{selectedTags.has(tag.toLowerCase().trim())
+								? 'bg-purple-500/40 text-purple-100 ring-2 ring-purple-400/50'
 								: 'bg-purple-500/20 text-purple-200 hover:bg-purple-500/30'}"
 							class:cursor-pointer={onTagClick}
 							disabled={!onTagClick}
 						>
-							{tag}
-							{#if clickedTag === tag}
-								<span class="absolute -top-1 -right-1 text-xs">✓</span>
-							{/if}
+							{formatTagDisplay(tag)}
 						</button>
 					{/each}
 				</div>
@@ -259,17 +278,14 @@
 					{#each formatTags(currentImage.tags.character) as tag}
 						<button
 							on:click={() => handleTagClick(tag)}
-							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
-								{clickedTag === tag
-								? 'bg-green-500/40 text-green-100 scale-105'
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer
+								{selectedTags.has(tag.toLowerCase().trim())
+								? 'bg-blue-500/40 text-blue-100 ring-2 ring-blue-400/50'
 								: 'bg-blue-500/20 text-blue-200 hover:bg-blue-500/30'}"
 							class:cursor-pointer={onTagClick}
 							disabled={!onTagClick}
 						>
-							{tag}
-							{#if clickedTag === tag}
-								<span class="absolute -top-1 -right-1 text-xs">✓</span>
-							{/if}
+							{formatTagDisplay(tag)}
 						</button>
 					{/each}
 				</div>
@@ -282,17 +298,14 @@
 					{#each formatTags(currentImage.tags.copyright) as tag}
 						<button
 							on:click={() => handleTagClick(tag)}
-							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
-								{clickedTag === tag
-								? 'bg-green-500/40 text-green-100 scale-105'
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer
+								{selectedTags.has(tag.toLowerCase().trim())
+								? 'bg-yellow-500/40 text-yellow-100 ring-2 ring-yellow-400/50'
 								: 'bg-yellow-500/20 text-yellow-200 hover:bg-yellow-500/30'}"
 							class:cursor-pointer={onTagClick}
 							disabled={!onTagClick}
 						>
-							{tag}
-							{#if clickedTag === tag}
-								<span class="absolute -top-1 -right-1 text-xs">✓</span>
-							{/if}
+							{formatTagDisplay(tag)}
 						</button>
 					{/each}
 				</div>
@@ -305,17 +318,14 @@
 					{#each formatTags(currentImage.tags.model) as tag}
 						<button
 							on:click={() => handleTagClick(tag)}
-							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
-								{clickedTag === tag
-								? 'bg-green-500/40 text-green-100 scale-105'
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer
+								{selectedTags.has(tag.toLowerCase().trim())
+								? 'bg-green-500/40 text-green-100 ring-2 ring-green-400/50'
 								: 'bg-green-500/20 text-green-200 hover:bg-green-500/30'}"
 							class:cursor-pointer={onTagClick}
 							disabled={!onTagClick}
 						>
-							{tag}
-							{#if clickedTag === tag}
-								<span class="absolute -top-1 -right-1 text-xs">✓</span>
-							{/if}
+							{formatTagDisplay(tag)}
 						</button>
 					{/each}
 				</div>
@@ -328,17 +338,14 @@
 					{#each formatTags(currentImage.tags.meta) as tag}
 						<button
 							on:click={() => handleTagClick(tag)}
-							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
-								{clickedTag === tag
-								? 'bg-green-500/40 text-green-100 scale-105'
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer
+								{selectedTags.has(tag.toLowerCase().trim())
+								? 'bg-gray-500/40 text-gray-100 ring-2 ring-gray-400/50'
 								: 'bg-gray-500/20 text-gray-200 hover:bg-gray-500/30'}"
 							class:cursor-pointer={onTagClick}
 							disabled={!onTagClick}
 						>
-							{tag}
-							{#if clickedTag === tag}
-								<span class="absolute -top-1 -right-1 text-xs">✓</span>
-							{/if}
+							{formatTagDisplay(tag)}
 						</button>
 					{/each}
 				</div>
@@ -351,17 +358,14 @@
 					{#each formatTags(currentImage.tags.general) as tag}
 						<button
 							on:click={() => handleTagClick(tag)}
-							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer relative
-								{clickedTag === tag
-								? 'bg-green-500/40 text-green-100 scale-105'
+							class="px-3 py-1.5 rounded-full text-sm transition-all duration-200 cursor-pointer
+								{selectedTags.has(tag.toLowerCase().trim())
+								? 'bg-red-500/40 text-red-100 ring-2 ring-red-400/50'
 								: 'bg-red-500/20 text-red-200 hover:bg-red-500/30'}"
 							class:cursor-pointer={onTagClick}
 							disabled={!onTagClick}
 						>
-							{tag}
-							{#if clickedTag === tag}
-								<span class="absolute -top-1 -right-1 text-xs">✓</span>
-							{/if}
+							{formatTagDisplay(tag)}
 						</button>
 					{/each}
 				</div>
@@ -371,4 +375,14 @@
 </dialog>
 
 <style>
+	@keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translate(-50%, -20px);
+		}
+		to {
+			opacity: 1;
+			transform: translate(-50%, 0);
+		}
+	}
 </style>

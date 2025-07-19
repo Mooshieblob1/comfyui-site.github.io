@@ -40,6 +40,9 @@
 	let filteredPosts: AIPost[] = [];
 	let tagFeedback: { message: string; type: 'added' | 'removed' } | null = null;
 	let feedbackTimeout: number | null = null;
+	let tagSearchQuery: string = '';
+	let showSuggestions: boolean = false;
+	let suggestedTags: { tag: string; count: number; category: string }[] = [];
 
 	// Helper function to get the 720p WebP preview image URL
 	function getPreviewUrl(post: AIPost): string {
@@ -172,6 +175,53 @@
 			.map(([tag, data]) => ({ tag, ...data }));
 	}
 
+	// Format tag for display (remove underscores)
+	function formatTagDisplay(tag: string): string {
+		return tag.replace(/_/g, ' ');
+	}
+
+	// Search tags based on query
+	function searchTags(query: string) {
+		if (!query.trim()) {
+			suggestedTags = [];
+			showSuggestions = false;
+			return;
+		}
+
+		const normalizedQuery = query.toLowerCase().trim();
+		const matches = Array.from(allTags.entries())
+			.filter(([tag]) => tag.includes(normalizedQuery))
+			.sort(([, a], [, b]) => b.count - a.count)
+			.slice(0, 10)
+			.map(([tag, data]) => ({ tag, ...data }));
+
+		suggestedTags = matches;
+		showSuggestions = matches.length > 0;
+	}
+
+	// Handle tag search input
+	function handleTagSearchInput() {
+		searchTags(tagSearchQuery);
+	}
+
+	// Handle selecting a suggested tag
+	function selectSuggestedTag(tag: string) {
+		toggleTag(tag);
+		tagSearchQuery = '';
+		showSuggestions = false;
+	}
+
+	// Handle search input key events
+	function handleSearchKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			tagSearchQuery = '';
+			showSuggestions = false;
+		} else if (e.key === 'Enter' && suggestedTags.length > 0) {
+			e.preventDefault();
+			selectSuggestedTag(suggestedTags[0].tag);
+		}
+	}
+
 	// Reactive statement to update filtered posts when posts change
 	$: {
 		posts;
@@ -202,7 +252,10 @@
 
 		// Show feedback
 		tagFeedback = {
-			message: action === 'added' ? `Filter added: "${tag}"` : `Filter removed: "${tag}"`,
+			message:
+				action === 'added'
+					? `Filter added: "${formatTagDisplay(tag)}"`
+					: `Filter removed: "${formatTagDisplay(tag)}"`,
 			type: action
 		};
 
@@ -307,6 +360,43 @@
 	{:else}
 		<!-- Tag Filter Section -->
 		<div class="mb-6 space-y-4">
+			<!-- Tag Search Bar -->
+			<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow relative">
+				<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Search Tags</h3>
+				<div class="relative">
+					<input
+						type="text"
+						bind:value={tagSearchQuery}
+						on:input={handleTagSearchInput}
+						on:keydown={handleSearchKeydown}
+						placeholder="Type to search tags..."
+						class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+					/>
+
+					<!-- Search suggestions dropdown -->
+					{#if showSuggestions && suggestedTags.length > 0}
+						<div
+							class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto"
+						>
+							{#each suggestedTags as { tag, count, category }}
+								<button
+									on:click={() => selectSuggestedTag(tag)}
+									class="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-between group"
+								>
+									<span class="text-gray-900 dark:text-white">{formatTagDisplay(tag)}</span>
+									<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+										<span class="capitalize bg-gray-100 dark:bg-gray-600 px-2 py-0.5 rounded"
+											>{category}</span
+										>
+										<span>({count})</span>
+									</div>
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			</div>
+
 			<!-- Selected Tags Display -->
 			{#if selectedTags.size > 0}
 				<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
@@ -317,7 +407,7 @@
 								on:click={() => toggleTag(tag)}
 								class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
 							>
-								{tag}
+								{formatTagDisplay(tag)}
 								<span class="ml-1 text-indigo-600 dark:text-indigo-300">×</span>
 							</button>
 						{/each}
@@ -335,14 +425,14 @@
 			{/if}
 
 			<!-- Popular Tags -->
-			<div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Popular Tags</h3>
-				<div class="space-y-3">
-					{#each ['general', 'character', 'artist', 'copyright', 'model'] as category}
-						{@const categoryTags = getSortedTags(category, 20)}
+			<div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow">
+				<h3 class="text-base font-medium text-gray-900 dark:text-white mb-2">Popular Tags</h3>
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+					{#each ['general', 'character', 'artist'] as category}
+						{@const categoryTags = getSortedTags(category, 8)}
 						{#if categoryTags.length > 0}
-							<div>
-								<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+							<div class="space-y-1">
+								<h4 class="text-xs font-medium text-gray-600 dark:text-gray-400 capitalize">
 									{category}
 								</h4>
 								<div class="flex flex-wrap gap-1">
@@ -352,10 +442,10 @@
 											class="inline-flex items-center px-2 py-1 rounded text-xs transition-colors
 												{selectedTags.has(tag)
 												? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'
-												: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
+												: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 										>
-											{tag}
-											<span class="ml-1 text-xs opacity-75">({count})</span>
+											{formatTagDisplay(tag)}
+											<span class="ml-1 text-xs opacity-60">({count})</span>
 										</button>
 									{/each}
 								</div>
@@ -390,10 +480,14 @@
 					</div>
 					<div class="p-3">
 						<h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
-							{post.tag_string_general.split(' ')[0]}
+							{formatTagDisplay(post.tag_string_general.split(' ')[0])}
 						</h3>
 						<p class="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
-							{post.tag_string_general.split(' ').slice(1, 4).join(', ')}
+							{post.tag_string_general
+								.split(' ')
+								.slice(1, 4)
+								.map((tag) => formatTagDisplay(tag))
+								.join(', ')}
 						</p>
 						<div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
 							<p>Score: {post.score}</p>
@@ -412,6 +506,7 @@
 		initialIndex={selectedImageIndex}
 		onClose={() => (selectedImageIndex = null)}
 		onTagClick={handleLightboxTagClick}
+		{selectedTags}
 	/>
 {/if}
 
